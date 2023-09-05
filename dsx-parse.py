@@ -17,7 +17,12 @@ class Record(object):
 			return ContainerView(self.properties).factory()
 		elif self.properties.get("oletype", None) == "CJobDefn":
 			return JobDefinition(self.properties).factory()
+		elif self.properties.get("oletype", None) == "CContainerStage":
+			return ContainerStage(self.properties).factory()
+		elif self.properties.get("oletype", None) == "CUnattachedDst":
+			return UnattachedDst(self.properties).factory()
 		else:
+			print(f'Stage type, partner, oletype not implemented: stagetype={self.properties.get("stagetype")}, partner={self.properties.get("partner")}, oletype={self.properties.get("oletype")}')
 			pp.pprint(self.properties)
 class Link(Record):
 	def __init__(self, properties):
@@ -35,6 +40,16 @@ class ContainerView(Record):
 	def factory(self):
 		return self
 class JobDefinition(Record):
+	def __init__(self, properties):
+		self.properties = properties
+	def factory(self):
+		return self
+class ContainerStage(Record):
+	def __init__(self, properties):
+		self.properties = properties
+	def factory(self):
+		return self
+class UnattachedDst(Record):
 	def __init__(self, properties):
 		self.properties = properties
 	def factory(self):
