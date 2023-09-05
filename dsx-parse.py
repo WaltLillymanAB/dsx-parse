@@ -15,7 +15,7 @@ class Record(object):
 			return Annotation(self.properties).factory() 
 		elif self.properties.get("oletype", None) == "CContainerView":
 			return ContainerView(self.properties).factory()
-		elif self.properties.get("oletype",None) == "CJobDefn":
+		elif self.properties.get("oletype", None) == "CJobDefn":
 			return JobDefinition(self.properties).factory()
 		else:
 			pp.pprint(self.properties)
@@ -47,18 +47,88 @@ class Stage(Record):
 			return TransformerStage(self.properties)
 		elif self.properties["oletype"] == "CCustomStage":
 			if self.properties["stagetype"] == "OracleConnectorPX":
-				return OracleConnectorStage(self.properties)
+				return OracleConnectorPXStage(self.properties)
+			if self.properties["stagetype"] == "ORAOCI9":
+				return ORAOCI9Stage(self.properties)
+			if self.properties["stagetype"] == "Teradata":
+				return TeradataStage(self.properties)
+			if self.properties["stagetype"] == "Terabulk":
+				return TerabulkStage(self.properties)
+			if self.properties["stagetype"] == "sort":
+				return sortStage(self.properties)
+			if self.properties["stagetype"] == "TDMLoad":
+				return TDMLoadStage(self.properties)
+			if self.properties["stagetype"] == "PxPeek":
+				return PxPeekStage(self.properties)
+			if self.properties["stagetype"] == "TeradataConnectorPX":
+				return TeradataConnectorPXStage(self.properties)
 			elif self.properties["stagetype"] == "PxSequentialFile":
-				return SequentialFileStage(self.properties)
+				return PxSequentialFileStage(self.properties)
+			elif self.properties["stagetype"] == "PxTeradata":
+				return PxTeradataStage(self.properties)
 			elif self.properties["stagetype"] == "PxAggregator":
-				return AggregatorStage(self.properties)
+				return PxAggregatorStage(self.properties)
+			elif self.properties["stagetype"] == "PxJoin":
+				return PxJoinStage(self.properties)
 			elif self.properties["stagetype"] == "PxRemDup":
 				return RemoveDuplicatesStage(self.properties)
 			elif self.properties["stagetype"] == "PxCopy":
 				return CopyStage(self.properties)
+			elif self.properties["stagetype"] == "AGGREGATOR":
+				return AGGREGATORStage(self.properties)
+			elif self.properties["stagetype"] == "CCollector":
+				return CCollectorStage(self.properties)
+			elif self.properties["stagetype"] == "Extract_PACK_for_BW":
+				return Extract_PACK_for_BWStage(self.properties)
+			elif self.properties["stagetype"] == "Extract_PACK_for_BW_PX":
+				return Extract_PACK_for_BW_PXStage(self.properties)
+			elif self.properties["stagetype"] == "Folder":
+				return FolderStage(self.properties)
+			elif self.properties["stagetype"] == "MQSeries":
+				return MQSeriesStage(self.properties)
+			elif self.properties["stagetype"] == "ODBCConnector":
+				return ODBCConnectorStage(self.properties)
+			elif self.properties["stagetype"] == "OracleConnector":
+				return OracleConnectorStage(self.properties)
+			elif self.properties["stagetype"] == "Pivot":
+				return PivotStage(self.properties)
+			elif self.properties["stagetype"] == "PivotPX":
+				return PivotPXStage(self.properties)
+			elif self.properties["stagetype"] == "PxChangeCapture":
+				return PxChangeCaptureStage(self.properties)
+			elif self.properties["stagetype"] == "PxColumnGenerator":
+				return PxColumnGeneratorStage(self.properties)
+			elif self.properties["stagetype"] == "PxDataSet":
+				return PxDataSetStage(self.properties)
+			elif self.properties["stagetype"] == "PxExternalSource":
+				return PxExternalSourceStage(self.properties)
+			elif self.properties["stagetype"] == "PxFunnel":
+				return PxFunnelStage(self.properties)
+			elif self.properties["stagetype"] == "PxLookup":
+				return PxLookupStage(self.properties)
+			elif self.properties["stagetype"] == "PxModify":
+				return PxModifyStage(self.properties)
+			elif self.properties["stagetype"] == "PxOracle":
+				return PxOracleStage(self.properties)
+			elif self.properties["stagetype"] == "PxRowGenerator":
+				return PxRowGeneratorStage(self.properties)
+			elif self.properties["stagetype"] == "PxSort":
+				return PxSortStage(self.properties)
+			elif self.properties["stagetype"] == "PxSurrogateKeyGenerator":
+				return PxSurrogateKeyGeneratorStage(self.properties)
+			elif self.properties["stagetype"] == "TDMLoadPX":
+				return TDMLoadPXStage(self.properties)
+			elif self.properties["stagetype"] == "TeradataConnector":
+				return TeradataConnectorStage(self.properties)
+			elif self.properties["stagetype"] == "TeradataPX":
+				return TeradataPXStage(self.properties)
+			elif self.properties["stagetype"] == "XMLInput":
+				return XMLInputStage(self.properties)
+			elif self.properties["stagetype"] == "XMLOutput":
+				return XMLOutputStage(self.properties)
 			else:
-				print("Stage type not implemented")
-				pp.pprint(self.properties)
+				print(f'Stage type not implemented: {self.properties.get("stagetype")}')
+				# pp.pprint(self.properties)
 		elif self.properties["oletype"] == "CJSExceptionHandler":
 			return ExceptionHandlerStage(self.properties)
 		elif self.properties["oletype"] == "CJSJobActivity":
@@ -69,8 +139,27 @@ class Stage(Record):
 			return TerminatorActivityStage(self.properties)
 		elif self.properties["oletype"] == "CJSUserVarsActivity":
 			return UserVarsActivityStage(self.properties)
-		#else:
-			#print self.properties
+		elif self.properties["oletype"] == "CHashedFileStage":
+			return HashedFileStage(self.properties)
+		elif self.properties["oletype"] == "CJSCondition":
+			return JSCondition(self.properties)
+		elif self.properties["oletype"] == "CJSEndLoopActivity":
+			return JSEndLoopActivity(self.properties)
+		elif self.properties["oletype"] == "CJSExecCmdActivity":
+			return JSExecCmdActivity(self.properties)
+		elif self.properties["oletype"] == "CJSRoutineActivity":
+			return JSRoutineActivity(self.properties)
+		elif self.properties["oletype"] == "CJSSequencer":
+			return JSSequencer(self.properties)
+		elif self.properties["oletype"] == "CJSStartLoopActivity":
+			return JSStartLoopActivity(self.properties)
+		elif self.properties["oletype"] == "CODBCStage":
+			return ODBCStage(self.properties)
+		elif self.properties["oletype"] == "CSeqFileStage":
+			return SeqFileStage(self.properties)
+		else:
+			print(f'OLE type not implemented: {self.properties.get("oletype")}')
+			# pp.pprint(self.properties)
 	def __str__(self):
 		return self.properties["name"]
 	def __repr__(self):
@@ -181,9 +270,45 @@ class Job(object):
 				self.properties["category"] = self.properties["category"].replace('\\\\', '/')
 
 
-class OracleConnectorStage(Stage):
+class OracleConnectorPXStage(Stage):
 	def __init__(self, properties):
-		super(Stage, self).__init__(properties) 
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class ORAOCI9Stage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class TeradataStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class TerabulkStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class sortStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class TDMLoadStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxPeekStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class TeradataConnectorPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxTeradataStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxJoinStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
 		self.properties = properties
 class RemoveDuplicatesStage(Stage):
 	def __init__(self, properties):
@@ -197,7 +322,7 @@ class TransformerStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
-class SequentialFileStage(Stage):
+class PxSequentialFileStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
@@ -225,7 +350,147 @@ class UserVarsActivityStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
-class AggregatorStage(Stage):
+class PxAggregatorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class AGGREGATORStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class CCollectorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class Extract_PACK_for_BWStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class Extract_PACK_for_BW_PXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class FolderStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class MQSeriesStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class ODBCConnectorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class OracleConnectorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PivotStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PivotPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxChangeCaptureStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxColumnGeneratorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxDataSetStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxExternalSourceStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxFunnelStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxLookupStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxModifyStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxOracleStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxRowGeneratorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxSortStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxSurrogateKeyGeneratorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class TDMLoadPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class TeradataConnectorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class TeradataPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class XMLInputStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class XMLOutputStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class HashedFileStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class JSCondition(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class JSEndLoopActivity(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class JSExecCmdActivity(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class JSRoutineActivity(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class JSSequencer(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class JSStartLoopActivity(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class ODBCStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class SeqFileStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
