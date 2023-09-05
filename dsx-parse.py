@@ -103,6 +103,8 @@ class Stage(Record):
 				return MQSeriesStage(self.properties)
 			elif self.properties["stagetype"] == "ODBCConnector":
 				return ODBCConnectorStage(self.properties)
+			elif self.properties["stagetype"] == "ODBCConnectorPX":
+				return ODBCConnectorPXStage(self.properties)
 			elif self.properties["stagetype"] == "OracleConnector":
 				return OracleConnectorStage(self.properties)
 			elif self.properties["stagetype"] == "Pivot":
@@ -117,10 +119,14 @@ class Stage(Record):
 				return PxDataSetStage(self.properties)
 			elif self.properties["stagetype"] == "PxExternalSource":
 				return PxExternalSourceStage(self.properties)
+			elif self.properties["stagetype"] == "PxFilter":
+				return PxFilterStage(self.properties)
 			elif self.properties["stagetype"] == "PxFunnel":
 				return PxFunnelStage(self.properties)
 			elif self.properties["stagetype"] == "PxLookup":
 				return PxLookupStage(self.properties)
+			elif self.properties["stagetype"] == "PxMerge":
+				return PxMergeStage(self.properties)
 			elif self.properties["stagetype"] == "PxModify":
 				return PxModifyStage(self.properties)
 			elif self.properties["stagetype"] == "PxOracle":
@@ -141,6 +147,16 @@ class Stage(Record):
 				return XMLInputStage(self.properties)
 			elif self.properties["stagetype"] == "XMLOutput":
 				return XMLOutputStage(self.properties)
+			elif self.properties["stagetype"] == "DRSPX":
+				return DRSPXStage(self.properties)
+			elif self.properties["stagetype"] == "PxExternalFilter":
+				return PxExternalFilterStage(self.properties)
+			elif self.properties["stagetype"] == "STP":
+				return STPStage(self.properties)
+			elif self.properties["stagetype"] == "XMLInputPX":
+				return XMLInputPXStage(self.properties)
+			elif self.properties["stagetype"] == "XMLOutputPX":
+				return XMLOutputPXStage(self.properties)
 			else:
 				print(f'Stage type not implemented: {self.properties.get("stagetype")}')
 				# pp.pprint(self.properties)
@@ -172,6 +188,8 @@ class Stage(Record):
 			return ODBCStage(self.properties)
 		elif self.properties["oletype"] == "CSeqFileStage":
 			return SeqFileStage(self.properties)
+		elif self.properties["oletype"] == "CJSWaitFileActivity":
+			return JSWaitFileActivity(self.properties)
 		else:
 			print(f'OLE type not implemented: {self.properties.get("oletype")}')
 			# pp.pprint(self.properties)
@@ -397,6 +415,10 @@ class ODBCConnectorStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
+class ODBCConnectorPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
 class OracleConnectorStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
@@ -429,7 +451,15 @@ class PxFunnelStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
+class PxFilterStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
 class PxLookupStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxMergeStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
@@ -473,6 +503,26 @@ class XMLOutputStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
+class DRSPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxExternalFilterStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class STPStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class XMLInputPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class XMLOutputPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
 class HashedFileStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
@@ -506,6 +556,10 @@ class ODBCStage(Stage):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
 class SeqFileStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class JSWaitFileActivity(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
