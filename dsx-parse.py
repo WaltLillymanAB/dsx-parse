@@ -875,14 +875,15 @@ if __name__ == "__main__":
 							del ins_and_outs[ins_and_outs.index(item)]
 							build(item, ins_and_outs)
 
+		print(f'Line {getframeinfo(currentframe()).lineno}:')
 		for job in d.jobs:
 			print ("______________________________________________________")
 			print (job.properties["name"])
 			ins_and_outs = []
 
+			print(f'Line {getframeinfo(currentframe()).lineno}:')
 			for stage in job.stages:
 				try:
-
 					tup = {"name":stage.properties["name"]}
 					if stage.properties.get("inputpins"):
 						if stage is not None and stage.properties.get("inputpins") is not None and find_by_id(job.links, stage.properties.get("inputpins")) is not None:
