@@ -1,5 +1,6 @@
 import re
 import pprint
+from inspect import currentframe, getframeinfo
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -137,6 +138,8 @@ class Stage(Record):
 				return PxSortStage(self.properties)
 			elif self.properties["stagetype"] == "PxSurrogateKeyGenerator":
 				return PxSurrogateKeyGeneratorStage(self.properties)
+			elif self.properties["stagetype"] == "PxTail":
+				return PxTailStage(self.properties)
 			elif self.properties["stagetype"] == "TDMLoadPX":
 				return TDMLoadPXStage(self.properties)
 			elif self.properties["stagetype"] == "TeradataConnector":
@@ -149,6 +152,8 @@ class Stage(Record):
 				return XMLOutputStage(self.properties)
 			elif self.properties["stagetype"] == "DRSPX":
 				return DRSPXStage(self.properties)
+			elif self.properties["stagetype"] == "STPPX":
+				return STPPXStage(self.properties)
 			elif self.properties["stagetype"] == "PxExternalFilter":
 				return PxExternalFilterStage(self.properties)
 			elif self.properties["stagetype"] == "STP":
@@ -157,6 +162,24 @@ class Stage(Record):
 				return XMLInputPXStage(self.properties)
 			elif self.properties["stagetype"] == "XMLOutputPX":
 				return XMLOutputPXStage(self.properties)
+			elif self.properties["stagetype"] == "CInterProcess":
+				return InterProcessStage(self.properties)
+			elif self.properties["stagetype"] == "Load_PACK_for_BW":
+				return Load_PACK_for_BWStage(self.properties)
+			elif self.properties["stagetype"] == "MERGE":
+				return MERGEStage(self.properties)
+			elif self.properties["stagetype"] == "PxDifference":
+				return PxDifferenceStage(self.properties)
+			elif self.properties["stagetype"] == "CPartitioner":
+				return PartitionerStage(self.properties)
+			elif self.properties["stagetype"] == "PxOdbc":
+				return PxOdbcStage(self.properties)
+			elif self.properties["stagetype"] == "WebSphereMQConnector":
+				return WebSphereMQConnectorStage(self.properties)
+			elif self.properties["stagetype"] == "WebSphereMQConnectorPX":
+				return WebSphereMQConnectorPXStage(self.properties)
+			elif self.properties["stagetype"] == "CFF":
+				return CFFStage(self.properties)
 			else:
 				print(f'Stage type not implemented: {self.properties.get("stagetype")}')
 				# pp.pprint(self.properties)
@@ -190,6 +213,8 @@ class Stage(Record):
 			return SeqFileStage(self.properties)
 		elif self.properties["oletype"] == "CJSWaitFileActivity":
 			return JSWaitFileActivity(self.properties)
+		elif self.properties["oletype"] == "CUvStage":
+			return UvStage(self.properties)
 		else:
 			print(f'OLE type not implemented: {self.properties.get("oletype")}')
 			# pp.pprint(self.properties)
@@ -197,16 +222,17 @@ class Stage(Record):
 		return self.properties["name"]
 	def __repr__(self):
 		return self.properties["name"]
+
 class DSX(object):
-	stage_types = ['OracleConnectorPX',
-					'CTransformerStage',
-					'PxSequentialFile',
-					'PxAggregator',
-					'CJobActivity',
-					'CNotificationActivity',
-					'CExceptionHandler',
-					'CTerminatorActivity',
-					'CUserVarsActivity']
+	# stage_types = ['OracleConnectorPX',
+	# 				'CTransformerStage',
+	# 				'PxSequentialFile',
+	# 				'PxAggregator',
+	# 				'CJobActivity',
+	# 				'CNotificationActivity',
+	# 				'CExceptionHandler',
+	# 				'CTerminatorActivity',
+	# 				'CUserVarsActivity']
 	search_types = ["JOB", "STAGE", "LINK", "STRING", "PARAMETER"]
 	def __init__(self, properties):
 		self.jobs = []
@@ -463,6 +489,10 @@ class PxMergeStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
+class PxDifferenceStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
 class PxModifyStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
@@ -480,6 +510,10 @@ class PxSortStage(Stage):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
 class PxSurrogateKeyGeneratorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxTailStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
@@ -507,6 +541,10 @@ class DRSPXStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
+class STPPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
 class PxExternalFilterStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
@@ -520,6 +558,18 @@ class XMLInputPXStage(Stage):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
 class XMLOutputPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class InterProcessStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class Load_PACK_for_BWStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class MERGEStage(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
@@ -547,6 +597,10 @@ class JSSequencer(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
+class Partitioner(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
 class JSStartLoopActivity(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
@@ -563,9 +617,32 @@ class JSWaitFileActivity(Stage):
 	def __init__(self, properties):
 		super(Stage, self).__init__(properties)
 		self.properties = properties
+class PartitionerStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class UvStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class PxOdbcStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class WebSphereMQConnectorStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class WebSphereMQConnectorPXStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
+class CFFStage(Stage):
+	def __init__(self, properties):
+		super(Stage, self).__init__(properties)
+		self.properties = properties
 
 #class SubRecord(object):
-
 
 class DSXParser(object):
 	def __init__(self, filename=None, data=None):
@@ -782,6 +859,7 @@ if __name__ == "__main__":
 				for child in head["children"]:
 					print('    ' * (level-1) + '+---' + child["name"])
 					print_node(child, level+1)
+
 		def build(head, ins_and_outs):
 			if head is not None:
 				if not head["outputs"]:
@@ -796,6 +874,7 @@ if __name__ == "__main__":
 							head["children"].append(item)
 							del ins_and_outs[ins_and_outs.index(item)]
 							build(item, ins_and_outs)
+
 		for job in d.jobs:
 			print ("______________________________________________________")
 			print (job.properties["name"])
@@ -827,12 +906,14 @@ if __name__ == "__main__":
 					
 					break
 			build(head, ins_and_outs)
+			print(f'print_node(head) at Line {getframeinfo(currentframe()).lineno}') # 
 			print_node(head)
 	elif mode == "showderivations":
 		def find_source_from_link(link_id, stages):
 			for stage in stages:
-				if link_id in stage.properties.get("outputpins"):
-					return stage
+				if stage.properties.get("outputpins"):
+					if link_id in stage.properties.get("outputpins"):
+						return stage
 			return None
 		for job in d.jobs:
 			print ("______________________________________________________")
