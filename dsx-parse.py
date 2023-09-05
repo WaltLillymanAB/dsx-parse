@@ -1,8 +1,8 @@
-
-
 import re
 import pprint
+
 pp = pprint.PrettyPrinter(indent=4)
+
 class Record(object):
 	def __init__(self, properties):
 		self.properties = properties
@@ -255,12 +255,13 @@ class DSXParser(object):
 		lines = iter(dsx.split("\n"))
 		while True:
 			try:
-
-				line = lines.next()
+				# line = lines.__next__()  # __next__()
+				line = lines.__next__() 
 				if re.match(r'.*BEGIN HEADER.*', line):
 					subr = line +"\n"
 					while True:
-						line = lines.next()
+						# line = lines.__next__()
+						line = lines.__next__() 
 						subr += line + "\n"	
 						if re.match(r'.*END HEADER.*', line):
 							dsx_dict["header"] = self.parse_header(subr)
@@ -268,7 +269,7 @@ class DSXParser(object):
 				if re.match(r'.*BEGIN DSJOB.*', line):
 					subr = line +"\n"
 					while True:
-						line = lines.next()
+						line = lines.__next__()
 						subr += line + "\n"	
 						if re.match(r'.*END DSJOB.*', line):
 							dsx_dict["jobs"].append(self.parse_job(subr))
@@ -283,7 +284,7 @@ class DSXParser(object):
 		lines = iter(job.split("\n"))
 		while True:
 			try:
-				line = lines.next()
+				line = lines.__next__()
 				if re.match(r'.*BEGIN DSJOB.*', line):
 					continue
 				if re.match(r'.*END DSJOB.*', line):
@@ -291,7 +292,7 @@ class DSXParser(object):
 				if re.match(r'.*BEGIN DSRECORD.*', line):
 					subr = line +"\n"
 					while True:
-						line = lines.next()
+						line = lines.__next__()
 						raw += line +"\n"
 						subr += line + "\n"	
 						if re.match(r'.*END DSRECORD.*', line):
@@ -307,7 +308,7 @@ class DSXParser(object):
 						linegroup = value
 						while True:
 							try:
-								line = lines.next()
+								line = lines.__next__()
 								raw += line + "\n"
 								linegroup += line +"\n"
 								if line.startswith('=+=+=+='):
@@ -328,7 +329,7 @@ class DSXParser(object):
 		lines = iter(record.split("\n"))
 		while True:
 			try:
-				line = lines.next()
+				line = lines.__next__()
 				if re.match(r'.*BEGIN DSRECORD.*', line):
 					continue
 				if re.match(r'.*END DSRECORD.*', line):
@@ -336,7 +337,7 @@ class DSXParser(object):
 				if re.match(r'.*BEGIN DSSUBRECORD.*', line):
 					subr = line +"\n"
 					while True:
-						line = lines.next()
+						line = lines.__next__()
 						subr += line + "\n"	
 						if re.match(r'.*END DSSUBRECORD.*', line):
 							r_dict["subrecords"].append(self.parse_subrecord(subr))
@@ -351,7 +352,7 @@ class DSXParser(object):
 						linegroup = value
 						while True:
 							try:
-								line = lines.next()
+								line = lines.__next__()
 								linegroup += line +"\n"
 								if line.startswith('=+=+=+='):
 									break
@@ -370,7 +371,7 @@ class DSXParser(object):
 		lines = iter(header.split("\n"))
 		while True:
 			try:
-				line = lines.next()
+				line = lines.__next__()
 				m = re.match('\s*(\w+)\s+?(.+)', line)
 				if m:
 					key = m.group(1).strip('"').lower()
@@ -379,7 +380,7 @@ class DSXParser(object):
 						linegroup = value
 						while True:
 							try:
-								line = lines.next()
+								line = lines.__next__()
 								linegroup += line +"\n"
 								if line.startswith('=+=+=+='):
 									break
@@ -398,7 +399,7 @@ class DSXParser(object):
 		lines = iter(subr.split("\n"))
 		while True:
 			try:
-				line = lines.next()
+				line = lines.__next__()
 				if re.match(r'.*BEGIN DSSUBRECORD.*', line):
 					continue
 				if re.match(r'.*END DSSUBRECORD.*', line):
@@ -411,7 +412,7 @@ class DSXParser(object):
 						linegroup = value
 						while True:
 							try:
-								line = lines.next()
+								line = lines.__next__()
 								linegroup += line +"\n"
 								if line.startswith('=+=+=+='):
 									break
@@ -425,37 +426,14 @@ class DSXParser(object):
 			except StopIteration:
 				break
 		return subr_dict
-# if __name__ == "__main__":
-# 	import sys, os
-# 	dp = DSXParser(filename=sys.argv[1])
-# 	d = dp.parse()
-# 	for job in d.jobs:
-# 		print job.properties["name"], job.properties["category"], os.path.dirname(sys.argv[1])
-# 		target_dir = os.path.join(os.path.dirname(sys.argv[1]), "ABAP", job.properties["category"][1:])
-# 		print target_dir
-# 		for link in job.links:
-# 			code = None
-# 			prog_id = None
-# 			for sub in link.properties["subrecords"]:
-# 				if sub["name"] == "ABAPCODE":
-# 					code = sub["value"].replace("=+=+=+=", "")
-# 				if sub["name"] == "SAPPROGID":
-# 					prog_id = sub["value"]
-# 				if code != None and prog_id != None:
-# 						print prog_id, code[0:10]
-# 						try:
-# 							os.makedirs(target_dir)
-# 						except Exception as e:
-# 							print e
-# 						with open("%s/%s-%s.txt" % (target_dir, job.properties["name"], prog_id), 'w') as f:
-# 							f.write(code)
-# 						break	
+
 def find_by_id(stages, idx):
 	for stage in stages:
 		#print "#", stage.properties["identifier"].strip(), idx
 		if stage.properties["identifier"].strip() == idx.strip():
 			return stage
 	return None
+
 if __name__ == "__main__":
 	import sys
 	mode = sys.argv[1]
@@ -463,21 +441,27 @@ if __name__ == "__main__":
 	d = dp.parse()
 	if mode == "showtree":
 		def print_node(head, level=0):
-			if not head.get("children"):
-				return
-			for child in head["children"]:
-				print('    ' * (level-1) + '+---' + child["name"])
-				print_node(child, level+1)
+			if head is not None:
+				if not head.get("children"):
+					return
+			if head is not None:
+				for child in head["children"]:
+					print('    ' * (level-1) + '+---' + child["name"])
+					print_node(child, level+1)
 		def build(head, ins_and_outs):
-			if not head["outputs"]:
-				return 
-			head["children"] = []
-			for output in head["outputs"]:
-				for item in ins_and_outs:
-					if item["input"] == output:
-						head["children"].append(item)
-						del ins_and_outs[ins_and_outs.index(item)]
-						build(item, ins_and_outs)
+			if head is not None:
+				if not head["outputs"]:
+					return 
+			if head is not None:
+				head["children"] = []
+			if head is not None:
+				for output in head["outputs"]:
+					for item in ins_and_outs:
+						# if item["input"] == output:
+						if item.get(input) == output:
+							head["children"].append(item)
+							del ins_and_outs[ins_and_outs.index(item)]
+							build(item, ins_and_outs)
 		for job in d.jobs:
 			print ("______________________________________________________")
 			print (job.properties["name"])
@@ -488,7 +472,8 @@ if __name__ == "__main__":
 
 					tup = {"name":stage.properties["name"]}
 					if stage.properties.get("inputpins"):
-						tup["input"] = find_by_id(job.links, stage.properties.get("inputpins")).properties["name"]
+						if stage is not None and stage.properties.get("inputpins") is not None and find_by_id(job.links, stage.properties.get("inputpins")) is not None:
+							tup["input"] = find_by_id(job.links, stage.properties.get("inputpins")).properties["name"]
 					else:
 						tup["input"] = None
 					if stage.properties.get("outputpins"):
@@ -501,7 +486,8 @@ if __name__ == "__main__":
 					pp.pprint(stage.properties)
 			head = None
 			for item in ins_and_outs:
-				if item["input"] == None:
+				# if item["input"] == None:  # KeyError
+				if item.get(input) is None:
 					head = item
 					del ins_and_outs[ins_and_outs.index(item)]
 					
