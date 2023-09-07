@@ -1,3 +1,8 @@
 Teradata Using Project/
 Results/
 venv/
+.vscode/
+*.pkl
+*.txt
+!Python venv setup.txt
+!requirements.txt
