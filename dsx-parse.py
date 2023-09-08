@@ -1,6 +1,7 @@
 import re
 import pprint
 from inspect import currentframe, getframeinfo
+import dill as pickle
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -875,13 +876,11 @@ if __name__ == "__main__":
 							del ins_and_outs[ins_and_outs.index(item)]
 							build(item, ins_and_outs)
 
-		print(f'Line {getframeinfo(currentframe()).lineno}:')
 		for job in d.jobs:
-			print ("______________________________________________________")
-			print (job.properties["name"])
+			# print ("______________________________________________________")
+			# print (job.properties["name"])
 			ins_and_outs = []
 
-			print(f'Line {getframeinfo(currentframe()).lineno}:')
 			for stage in job.stages:
 				try:
 					tup = {"name":stage.properties["name"]}
@@ -907,7 +906,6 @@ if __name__ == "__main__":
 					
 					break
 			build(head, ins_and_outs)
-			print(f'print_node(head) at Line {getframeinfo(currentframe()).lineno}') # 
 			print_node(head)
 	elif mode == "showderivations":
 		def find_source_from_link(link_id, stages):
@@ -943,3 +941,7 @@ if __name__ == "__main__":
 									break
 							print (sub.get("sourcecolumn"), "|", sub.get("derivation"), "|", sub.get("name"))
 
+	# Save dictionary to file:
+	with open('EDW_DW1_PROD.pkl', 'wb') as f:
+		# Pickle the 'data' dictionary using the highest protocol available.
+		pickle.dump(d, f, pickle.HIGHEST_PROTOCOL)
