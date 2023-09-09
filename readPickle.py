@@ -88,46 +88,55 @@ print(type(d.properties['header'])) # d.properties is a dict, d.properties['head
 print(d.properties['header']) # Returns the whole dict.
 print(d.properties['header']['servername'], d.properties['header']['toolinstanceid']) # Returns the string values of the keys, servername & toolinstanceid, from the dict, d.properties['header'].
 
+# Examine value of key, d.properties['jobs'] :
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-print(type(d.properties['jobs'])) # d.properties is a dict, d.properties['jobs'] is a list
+print(type(d.properties['jobs'])) # d.properties is a dict, d.properties['jobs'] is a list.
 # How many items are in the list?
 print(len(d.properties['jobs'])) # 2881, same as the count of BEGIN DSJOB.
 
+# What is the type of the first item in the list?
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-print(d.properties['jobs'][0]) # The zeroeth (first) item in the list
+print(type(d.properties['jobs'][0])) # d.properties is a dict, d.properties['jobs'] is a list, and d.properties['jobs'][0] is a dict.
+
+# How many keys are in the dict, and what are their names?
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-print(d.properties['jobs'][1]) # The second item in the list
+print(len(d.properties['jobs'][0])) # 48 keys. 
+print(d.properties['jobs'][0].keys())
+# The key, raw, has all the text. The other keys break out the stuff in raw, I think.
+# There are 2881 DSJOBs represented in d.properties['jobs']). 
+# In the first DSJOB, there are 48 keys, including raw, (so maybe 47 things from the dsx file.)
+# The keys of interest include identifier, oletype, name, description, jobtype. Maybe others are complex, like subrecords ?
 
-
-
-
+# From the first and second items in the list, get these keys' string values:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-# print(d.properties['jobs'])
+print(d.properties['jobs'][0]['identifier'], d.properties['jobs'][0]['oletype'], d.properties['jobs'][0]['name'])
+print(d.properties['jobs'][1]['identifier'], d.properties['jobs'][1]['oletype'], d.properties['jobs'][1]['name'])
 
-# Print things of interest from the header:
+# What's the type of subrecords?
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-print(d.header['servername'], d.header['toolinstanceid'])
+print(type(d.properties['jobs'][0]['subrecords'])) # List
 
-# Print things of interest from jobs:
+# Get the type of each thing in the 48 things:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-# print(d.jobs[])
+for i in d.properties['jobs'][0]:
+  print(i, type(d.properties['jobs'][0][i])) # subrecords is a list, all others are str.
 
-print(type(d.properties['jobs'])) # List
-
-
-# Get items of interest for this project file:
+# Get the count of items in the subrecords list:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-# print(d.properties) # A dict with key=jobs, value=one job name with records & subrecords. 
-# print()
-# print(d.properties['jobs'])
-# print()
+print(len(d.properties['jobs'][0]['subrecords'])) # 23 items in the subrecords list.
 
-# parse_dsx() returns a dict that looks like, {"jobs":[]}
+# Dump that list:
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+print(d.properties['jobs'][0]['subrecords']) # Looks like dicts are in that list.
 
+# Get the type of each item in the list:
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+for i in d.properties['jobs'][0]['subrecords']:
+  print(type(i)) # Every item in the list is a dict.
 
-# print(f'{len(d.properties[0])}') # Key error
-# print(f'{len(d)}') # no len() for DSX
-# print(f'{len(d.properties.jobs)}') # 'dict' object has no attribute 'jobs'
-# print(d.properties.get('jobs', 'bad')) # Worked. Returns a list of one or more dicts. key='raw'. Name: AAP_HISTY_FastLoadINS
-# print(d.properties.jobs.get(0, 'bad')) # 'dict' object has no attribute 'jobs'
-
+# Get the key & value for each item in the dict:
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+for i in d.properties['jobs'][0]['subrecords']:
+  print()
+  for j in i:
+    print(f'{j}={i[j]}')
