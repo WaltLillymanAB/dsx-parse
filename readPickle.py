@@ -12,60 +12,20 @@ pretty_file=project_file + '_pp.txt'
 with open(pickle_file, 'rb') as f:
   d = pickle.load(f)
 
-# Print the contents of a node.
-print(f'\n### {getframeinfo(currentframe()).lineno}:')
-pp.pprint(f"d.properties['header']['toolinstanceid'] = {d.properties['header']['toolinstanceid']}") # EDW_DW1_PROD
-# pp.pprint(d.properties['jobs']) # Prints ALL the jobs & details, too much.
-
-'''
-d: DSX object instance
- properties: dict
-  jobs: list
-   0, 1, 2: dict
-    name: str
-'''
-
-# for prop in d.properties:
-  # pprint(prop) # TypeError: 'module' object is not callable
-
-# for key,val in d.properties:
-#   for i in val:
-#     pp.pprint(f"{key} : {i}")  # ValueError: too many values to unpack (expected 2)
-
-# print(d.properties['jobs']) # 1
-# print(d.get('header', 'unknown'))
-# d is a DSX object, which doesn't have "get()"
-# DSX object is a list.
-
-# print(f'print_node(head) at Line {getframeinfo(currentframe()).lineno}') # 
-# pp.pprint(d.properties['jobs'][0]['records'][0]['subrecords'][0]) # KeyError: 'records'
-# pp.pprint(d.properties['jobs'][0]['records'][0]['subrecords'][8])
-# print(d.properties['jobs'][0]['subrecords'][0]) # KeyError: 'records'
-# print(d.properties['jobs'][0]['subrecords'][0]['identifier']) # KeyError: 'records'
-# print(d.properties['jobs'][0][0][0]['identifier']) # KeyError: 'records'
-# print(d.properties['jobs'][3]['records'][3]['fulldescription']) # KeyError: 'records'
-print(f'\n### {getframeinfo(currentframe()).lineno}:')
-print(d.properties['jobs'][3]['subrecords'][2]['default']) # /etl/dev/mss/budnet/data/vip/hash
-print()
-pp.pprint(d.properties['jobs'][3]['subrecords'][2]) # all elements which appears to be a dict.
-print()
-for i in d.properties['jobs'][3]['subrecords'][2]:
-  pp.pprint(i)
-print()
-
-# Write to file in pretty format:
+# Write to file in pretty format for comparison:
 # with open(pretty_file, 'w') as out:
 #     PP = pprint.PrettyPrinter(indent=4, width=254, sort_dicts=False, stream=out)
 #     PP.pprint(d.properties['jobs'])
 
+# From the top, get the type of each thing, and the types of the thing's nested things, etc., till no more unknown nested things.
 # Get type of object, d:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
 print(type(d)) # '__main__.DSX'
 # It's a class. Get directory of items in d:
 pp.pprint(d.__dir__()) # A list of items, incl. jobs, properties, header, 
   # search_types, which is a list of ["JOB", "STAGE", "LINK", "STRING", "PARAMETER"]
-  # See in code, jobs gets an appendsion of each BEGIN_DSJOB, # 687
-  # records gets an appendsion of each BEGIN_DSRECORD, # 711
+  # See in dsx-parse's code, jobs gets an appendsion of each BEGIN_DSJOB, #687
+  # records gets an appendsion of each BEGIN_DSRECORD, #711
   # subrecords gets an appendsion of each BEGIN DSSUBRECORD, #755
 # Get types of items of interest in object:
 print(type(d.jobs)) # 'map'
@@ -134,9 +94,44 @@ print(f'\n### {getframeinfo(currentframe()).lineno}:')
 for i in d.properties['jobs'][0]['subrecords']:
   print(type(i)) # Every item in the list is a dict.
 
+# Get the type for every value in the dict:
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+for i in d.properties['jobs'][0]['subrecords']:
+  print()
+  for j in i:
+    print(f'{j} type is {type(i[j])}')  # Each key's value is a string, no nested.
+
 # Get the key & value for each item in the dict:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
 for i in d.properties['jobs'][0]['subrecords']:
   print()
   for j in i:
     print(f'{j}={i[j]}')
+
+# An example of the lowest level thing:
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+print(d.properties['jobs'][0]['subrecords'][0]['default']) # $PROJDEF
+print(d.properties['jobs'][0]['subrecords'][8]['default']) # firecall_331926
+
+# Dictionaries: Use "get()" to prevent raising KeyError:  dict.get(key, default)
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+print(d.properties.get('jobs','Nada')[0].get('subrecords','Nada')[8].get('default','Nada')) # firecall_331926
+
+# Dynamically get each dicts keys' names:
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+for i in d.properties.get('jobs')[0].get('subrecords'):
+  print()
+  for j in i:
+    print(f'{j}={i[j]}')
+
+'''
+So create a long-ass dataframe with one row for every lowest-level item.
+The left column contents will repeat a lot.
+
+project, job, record, subrecord
+Project is d.
+It has properties, header, where I fetch servername and toolinstanceid
+
+It has properties, jobs
+
+'''
