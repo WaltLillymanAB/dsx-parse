@@ -95,7 +95,7 @@ print(d.properties['jobs'][0]['subrecords']) # Looks like dicts are in that list
 # Get the type of each item in the list:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
 for i in d.properties['jobs'][0]['subrecords']:
-  print(type(i)) # Every item in the list is a dict.
+  print(type(i)) # Every item in the subrecords list is a dict.
 
 # Get the type for every value in the dict:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
@@ -148,9 +148,17 @@ for i in d.properties.get('jobs','NotFound'):
     if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
       print(j, end="|-O-|")
       print(i[j], end="|-O-|")
+    elif j == 'subrecords':  # It's a list of dicts.
+      for n in i[j]:
+        for p in n:
+          print(p, end="|-O-|")
+          print(n.get(p), end="|-O-|")
   print()
-print()
 sys.stdout.close()
 sys.stdout = stdout_fileno
 
-# Subrecords will be next set of columns.
+# 2023-09-09 16:59:12
+# To do:
+# Get rid of newlines in output.
+# Desired stage types aren't showing up, but are in pretty print.
+# whittle down the unneeded columns.
