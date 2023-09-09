@@ -1,3 +1,4 @@
+import sys
 import dill as pickle
 from inspect import currentframe, getframeinfo
 import pprint
@@ -6,6 +7,7 @@ pp = pprint.PrettyPrinter(indent=4)
 project_file='EDW_DW1_PROD'
 pickle_file=project_file + '.pkl'
 pretty_file=project_file + '_pp.txt'
+parsed_file=project_file + '_parsed.txt'
 
 # Now to access objects' properties:
 # Load the dictionary from a .pkl file created by dsx-parse.py
@@ -27,6 +29,7 @@ pp.pprint(d.__dir__()) # A list of items, incl. jobs, properties, header,
   # See in dsx-parse's code, jobs gets an appendsion of each BEGIN_DSJOB, #687
   # records gets an appendsion of each BEGIN_DSRECORD, #711
   # subrecords gets an appendsion of each BEGIN DSSUBRECORD, #755
+
 # Get types of items of interest in object:
 print(type(d.jobs)) # 'map'
 print(type(d.properties)) # 'dict'
@@ -125,13 +128,29 @@ for i in d.properties.get('jobs')[0].get('subrecords'):
     print(f'{j}={i[j]}')
 
 '''
-So create a long-ass dataframe with one row for every lowest-level item.
+So create a wide output with one row for every lowest-level item.
 The left column contents will repeat a lot.
-
-project, job, record, subrecord
-Project is d.
-It has properties, header, where I fetch servername and toolinstanceid
-
-It has properties, jobs
-
 '''
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+stdout_fileno = sys.stdout
+sys.stdout = open(parsed_file,'w')
+
+# Header contents in the first columns:
+for i in d.properties.get('header','NotFound'):
+  print(i, end="|-O-|") # Tie fighter field delimiter, doesn't appear in any DSX files
+  print(d.properties.get('header').get(i,'NotFound'), end="|-O-|")
+
+# Job records will be next set of columns.
+# Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
+# Exclude verbose multi-line fields, for now. To include them, will need to replace \n.
+for i in d.properties.get('jobs','NotFound'):
+  for j in i:
+    if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
+      print(j, end="|-O-|")
+      print(i[j], end="|-O-|")
+  print()
+print()
+sys.stdout.close()
+sys.stdout = stdout_fileno
+
+# Subrecords will be next set of columns.
