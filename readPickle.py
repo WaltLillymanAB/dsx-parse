@@ -1,4 +1,5 @@
 import sys
+import re
 import dill as pickle
 from inspect import currentframe, getframeinfo
 import pprint
@@ -36,9 +37,9 @@ print(type(d.properties)) # 'dict'
 print(type(d.header)) # 'dict'
 
 print() # Get counts:
-print(len(d.jobs.__dir__())) # 25
-print(len(d.properties)) # 2
-print(len(d.header)) # 11
+print(len(d.jobs.__dir__())) # 25  # jobs is a map
+print(len(d.properties)) # 2  # d.properties is a dict containing 2 keys.
+print(len(d.header)) # 11  # header is a dict containing 11 keys.
 
 # Get names of top-level things:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
@@ -128,34 +129,82 @@ for i in d.properties.get('jobs')[0].get('subrecords'):
     print(f'{j}={i[j]}')
 
 '''
-So create a wide output with one row for every lowest-level item.
+Create a really wide output with one row for every job.
 The left column contents will repeat a lot.
 '''
-print(f'\n### {getframeinfo(currentframe()).lineno}:')
-stdout_fileno = sys.stdout
-sys.stdout = open(parsed_file,'w')
+# print(f'\n### {getframeinfo(currentframe()).lineno}:')
+# with open(parsed_file, 'w', newline='|-O-|') as out:  # Tie fighter field delimiter, doesn't appear in any DSX files
+#   # Header contents in the first columns:
+#   for i in d.properties.get('header'):
+#     out.write(i) 
+#     out.write(d.properties.get('header').get(i))
 
+#   # Job records will be next set of columns.
+#   # Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
+#   # Exclude verbose multi-line fields, for now. To include them, will need to replace \n.
+#   for i in d.properties.get('jobs'):
+#     for j in i:
+#       if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
+#         out.write(j)
+#         out.write(i[j])
+#       elif j == 'subrecords':  # It's a list of dicts.
+#         for n in i[j]:  # For each dict in the list.
+#           for p in n:  # For each key in the dict.
+#             out.write(p)  # The key
+#             out.write(n.get(p))  # The value
+#     out.write('\n'[:-5])  # Don't write a trailing tie fighter.
+
+# Accumulate output into a string, field-delimited with tie fighter: |-O-|
+# One row per job, really, really wide, with no column headings, column names will prefix values for now:
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
+s=''
 # Header contents in the first columns:
-for i in d.properties.get('header','NotFound'):
-  print(i, end="|-O-|") # Tie fighter field delimiter, doesn't appear in any DSX files
-  print(d.properties.get('header').get(i,'NotFound'), end="|-O-|")
+for i in d.properties.get('header'):
+  s+=i+'|-O-|'
+  s+=d.properties.get('header').get(i)+'|-O-|'
 
 # Job records will be next set of columns.
 # Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
 # Exclude verbose multi-line fields, for now. To include them, will need to replace \n.
-for i in d.properties.get('jobs','NotFound'):
+# for i in d.properties.get('jobs'):
+#   for j in i:
+#     if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
+#       s+=j+'|-O-|'
+#       s+=i[j]+'|-O-|'
+#     elif j == 'subrecords':  # It's a list of dicts.
+#       for n in i[j]:  # For each dict in the list.
+#         for p in n:  # For each key in the dict.
+#           s+=p+'|-O-|'  # The key
+#           s+=n.get(p)+'|-O-|'  # The value
+#   s+='\n'
+
+# # Write that string to a file.
+# with open(parsed_file, 'wb') as out:
+#   out.write(s.encode('ascii'))
+
+# Producd a file with 2926 rows.  Should be 2881. Remove newlines:
+
+# Job records will be next set of columns.
+# Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
+# Exclude verbose multi-line fields, for now. To include them, will need to replace \n.
+for i in d.properties.get('jobs'):
   for j in i:
     if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
-      print(j, end="|-O-|")
-      print(i[j], end="|-O-|")
+      s += j + '|-O-|'
+      i[j] = re.sub('[\r\n]', '#nl ', i[j])
+      s += i[j] + '|-O-|'
     elif j == 'subrecords':  # It's a list of dicts.
-      for n in i[j]:
-        for p in n:
-          print(p, end="|-O-|")
-          print(n.get(p), end="|-O-|")
-  print()
-sys.stdout.close()
-sys.stdout = stdout_fileno
+      for n in i[j]:  # For each dict in the list.
+        for p in n:  # For each key in the dict.
+          s += p + '|-O-|'  # The key
+          t = re.sub('[\r\n]', '#nl ', n.get(p))
+          s += t + '|-O-|'  # The value
+  s+='\n'
+
+# Write that string to a file.
+with open(parsed_file, 'wb') as out:
+  out.write(s.encode('ascii'))
+
 
 # 2023-09-09 16:59:12
 # To do:
