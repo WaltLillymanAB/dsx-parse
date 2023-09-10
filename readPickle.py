@@ -128,14 +128,14 @@ for i in d.properties.get('jobs')[0].get('subrecords'):
   for j in i:
     print(f'{j}={i[j]}')
 
-# Accumulate output into a string, field-delimited with tie fighter: |-O-|
-# Replace embedded carriage-returns and line-feeds with '#nl '
+# Accumulate output into a string, field-delimited with character, Alt-0165
+# Replace embedded carriage-returns and line-feeds with ' '
 # One row per job, really, really wide, with no column headings, column names will prefix values for now:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-s=''           # String to accumulate result.
-fd='|-O-|'     # Field delimiter in output.
-crlf='[\r\n]'  # Carriage-return and line-feed pattern to replce.
-nl='#nl '      # Replacement text for embedded CR & LF.
+s=''           # Initialize tring to accumulate result.
+fd='¥'         # Field delimiter in output.
+crlf='[\r\n]'  # Carriage-return and line-feed pattern to replace.
+nl=' '         # Replacement text for embedded CR & LF.
 
 # Header contents in the first columns:
 for i in d.properties.get('header'):
@@ -143,12 +143,11 @@ for i in d.properties.get('header'):
   t = re.sub(crlf, nl, d.properties.get('header').get(i))
   s += t + fd  # The value
 
-# Job records will be next set of columns.
-# Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
-# Exclude verbose multi-line fields, for now. To include them, will need to replace \n.
+# ...followed by job and subrecord columns.
 for i in d.properties.get('jobs'):
   for j in i:
-    if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
+    # if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
+    if j != 'raw' and j != 'subrecords':
       s += j + fd
       i[j] = re.sub(crlf, nl, i[j])
       s += i[j] + fd
@@ -161,12 +160,6 @@ for i in d.properties.get('jobs'):
   s+='\n'
 
 # Write that string to a file.
+print(f'\n### {getframeinfo(currentframe()).lineno}:')
 with open(parsed_file, 'wb') as out:
-  out.write(s.encode('ascii'))
-
-
-# 2023-09-09 16:59:12
-# To do:
-# Get rid of newlines in output.
-# Desired stage types aren't showing up, but are in pretty print.
-# whittle down the unneeded columns.
+  out.write(s.encode('utf-8'))

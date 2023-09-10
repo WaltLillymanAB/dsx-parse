@@ -4,5 +4,6 @@ venv/
 .vscode/
 *.pkl
 *.txt
+*.xls*
 !Python venv setup.txt
 !requirements.txt
