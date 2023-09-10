@@ -128,61 +128,20 @@ for i in d.properties.get('jobs')[0].get('subrecords'):
   for j in i:
     print(f'{j}={i[j]}')
 
-'''
-Create a really wide output with one row for every job.
-The left column contents will repeat a lot.
-'''
-# print(f'\n### {getframeinfo(currentframe()).lineno}:')
-# with open(parsed_file, 'w', newline='|-O-|') as out:  # Tie fighter field delimiter, doesn't appear in any DSX files
-#   # Header contents in the first columns:
-#   for i in d.properties.get('header'):
-#     out.write(i) 
-#     out.write(d.properties.get('header').get(i))
-
-#   # Job records will be next set of columns.
-#   # Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
-#   # Exclude verbose multi-line fields, for now. To include them, will need to replace \n.
-#   for i in d.properties.get('jobs'):
-#     for j in i:
-#       if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
-#         out.write(j)
-#         out.write(i[j])
-#       elif j == 'subrecords':  # It's a list of dicts.
-#         for n in i[j]:  # For each dict in the list.
-#           for p in n:  # For each key in the dict.
-#             out.write(p)  # The key
-#             out.write(n.get(p))  # The value
-#     out.write('\n'[:-5])  # Don't write a trailing tie fighter.
-
 # Accumulate output into a string, field-delimited with tie fighter: |-O-|
+# Replace embedded carriage-returns and line-feeds with '#nl '
 # One row per job, really, really wide, with no column headings, column names will prefix values for now:
 print(f'\n### {getframeinfo(currentframe()).lineno}:')
-s=''
+s=''           # String to accumulate result.
+fd='|-O-|'     # Field delimiter in output.
+crlf='[\r\n]'  # Carriage-return and line-feed pattern to replce.
+nl='#nl '      # Replacement text for embedded CR & LF.
+
 # Header contents in the first columns:
 for i in d.properties.get('header'):
-  s+=i+'|-O-|'
-  s+=d.properties.get('header').get(i)+'|-O-|'
-
-# Job records will be next set of columns.
-# Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
-# Exclude verbose multi-line fields, for now. To include them, will need to replace \n.
-# for i in d.properties.get('jobs'):
-#   for j in i:
-#     if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
-#       s+=j+'|-O-|'
-#       s+=i[j]+'|-O-|'
-#     elif j == 'subrecords':  # It's a list of dicts.
-#       for n in i[j]:  # For each dict in the list.
-#         for p in n:  # For each key in the dict.
-#           s+=p+'|-O-|'  # The key
-#           s+=n.get(p)+'|-O-|'  # The value
-#   s+='\n'
-
-# # Write that string to a file.
-# with open(parsed_file, 'wb') as out:
-#   out.write(s.encode('ascii'))
-
-# Producd a file with 2926 rows.  Should be 2881. Remove newlines:
+  s += i + fd  # The key
+  t = re.sub(crlf, nl, d.properties.get('header').get(i))
+  s += t + fd  # The value
 
 # Job records will be next set of columns.
 # Exclude the keys, raw and subrecords. Raw will not be parsed. Subrecords is a list so it will be parsed, below.
@@ -190,15 +149,15 @@ for i in d.properties.get('header'):
 for i in d.properties.get('jobs'):
   for j in i:
     if j != 'raw' and j != 'subrecords' and j != 'description' and j != 'fulldescription' and j != 'jobcontrolcode' and j != 'orchestratecode':
-      s += j + '|-O-|'
-      i[j] = re.sub('[\r\n]', '#nl ', i[j])
-      s += i[j] + '|-O-|'
+      s += j + fd
+      i[j] = re.sub(crlf, nl, i[j])
+      s += i[j] + fd
     elif j == 'subrecords':  # It's a list of dicts.
       for n in i[j]:  # For each dict in the list.
         for p in n:  # For each key in the dict.
-          s += p + '|-O-|'  # The key
-          t = re.sub('[\r\n]', '#nl ', n.get(p))
-          s += t + '|-O-|'  # The value
+          s += p + fd  # The key
+          t = re.sub(crlf, nl, n.get(p))
+          s += t + fd  # The value
   s+='\n'
 
 # Write that string to a file.
