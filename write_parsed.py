@@ -45,18 +45,23 @@ len(d.properties['jobs'][0]['subrecords']) has 23 items. Every item in the subre
 print(f'\n### {getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
 print(type(d.properties.get('jobs')), len(d.properties.get('jobs'))) # is a list, 2881 items long.
 # for d in d.properties.get('jobs'): # jobs contains a list of dicts. The first dict in the list is records.
-#     # print(d.keys())  # 'records', 'raw', 'identifier', 'datemodified', 'timemodified'  These are the keys for this dict.
-#     for i in d:
-#         print(i, type(i))
+#   print(d.keys())  # 'records', 'raw', 'identifier', 'datemodified', 'timemodified'  These are the keys for this dict.
+#   for i in d.keys():
 
-
-exit(0)
+# print(d.properties.get('jobs')[0]('records')[0])
+# print(d.properties.get('jobs')[0].get('records')[0]) # WORKS.
+# pp.pprint(d.properties.get('jobs')[0].get('records')[0]) # WORKS.
+# pp.pprint(d.properties.get('jobs')[0].get('records')[0].get('subrecords')[0]) # WORKS.
+# pp.pprint(d.properties.get('jobs')[0].get('records')[0].get('subrecords')[0]) # WORKS
+# pp.pprint(d.properties.get('jobs')[0].get('records')[0].get('subrecords')) # WORKS
+# pp.pprint(d.properties.get('jobs')[0].get('records')[0].get('subrecords')[4].get('prompt')) # WORKS
 
 # Accumulate output into a string, field-delimited with character, Alt-0165
 # Replace embedded carriage-returns and line-feeds with ' '
 # One row per job, really, really wide, with no column headings, column names will prefix values for now:
+
 s=''           # Initialize tring to accumulate result.
-fd='¥'         # Field delimiter in output.
+fd='¥'         # Field delimiter in output, Alt-0165
 crlf='[\r\n]'  # Carriage-return and line-feed pattern to replace.
 nl=' '         # Replacement text for embedded CR+LF.
 
