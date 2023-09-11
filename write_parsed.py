@@ -31,6 +31,8 @@ d.properties['jobs'] is a list. 2881 items, same as the count of BEGIN DSJOB in 
 d.properties['jobs'][0] is a dict. 48 keys. The key, raw, has all the text. The other keys break out the stuff in raw.
 
 There are 2881 DSJOBs represented in d.properties['jobs']). 
+print(type(d.properties.get('jobs')), len(d.properties.get('jobs'))) # is a list, 2881 items long.
+
 In the first DSJOB, there are 48 keys, including raw, (so maybe 47 things from the dsx file.)
 The keys of interest include identifier, oletype, name, description, jobtype. Maybe others are complex, like subrecords ?
 
@@ -42,8 +44,8 @@ d.properties['jobs'][0]['subrecords'] is a list, all of subrecord's neighbors ar
 len(d.properties['jobs'][0]['subrecords']) has 23 items. Every item in the subrecords list is a dict. Each key's value is a string, no more nested dicts or lists.
 
 '''
-print(f'\n### {getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
-print(type(d.properties.get('jobs')), len(d.properties.get('jobs'))) # is a list, 2881 items long.
+# d->properties->jobs->records->subrecords
+
 # for d in d.properties.get('jobs'): # jobs contains a list of dicts. The first dict in the list is records.
 #   print(d.keys())  # 'records', 'raw', 'identifier', 'datemodified', 'timemodified'  These are the keys for this dict.
 #   for i in d.keys():
@@ -66,13 +68,31 @@ crlf='[\r\n]'  # Carriage-return and line-feed pattern to replace.
 nl=' '         # Replacement text for embedded CR+LF.
 
 print(f'\n### {getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
-# Header contents in the first columns:
-for i in d.properties.get('header'):
-  s += i + fd  # The key
-  t = re.sub(crlf, nl, d.properties.get('header').get(i))
+# There's one header per DSX project file. Get some "header" attributes:
+i = d.properties.get('header')
+for j in ['servername','toolinstanceid']:
+  s += j + fd  # The key
+  t = re.sub(crlf, nl, i.get(j))  # Replace cr+lf
   s += t + fd  # The value
 
-# ...followed by job and subrecord columns.
+# There's many "job" records per project file. Get some "job" attributes:
+for i in d.properties.get('jobs'):
+  for j in ['identifier','datemodified']: 
+    s += j + fd
+    t = re.sub(crlf, nl, i[j])
+    s += t + fd
+
+  # There's many "records" records per job. Get some "records" attributes:
+  for j in i.get('records'): 
+    for k in ['name','oletype','category','parameters']:
+      if j.get(k) is not None:
+        s += k + fd
+        t = re.sub(crlf, nl, j.get(k))
+        s += t + fd
+s+='\n'
+
+# subrecords...
+# NESTED already...
 for i in d.properties.get('jobs'):
   for j in i:
     if j == 'records':   # It's a list of dicts, incl. subrecords.
@@ -91,12 +111,12 @@ for i in d.properties.get('jobs'):
             s += p + fd  # The key
             t = re.sub(crlf, nl, n.get(p))  # n.get(p) produced a list of dicts to iterate thru...
             s += t + fd  # The value
-    elif  j == 'subrecords':  # It's a list of dicts.
-      for n in i[j]:  # For each dict in the list.
-        for p in n:  # For each key in the dict.
-          s += p + fd  # The key
-          t = re.sub(crlf, nl, n.get(p))
-          s += t + fd  # The value
+    # elif  j == 'subrecords':  # It's a list of dicts.
+    #   for n in i[j]:  # For each dict in the list.
+    #     for p in n:  # For each key in the dict.
+    #       s += p + fd  # The key
+    #       t = re.sub(crlf, nl, n.get(p))
+    #       s += t + fd  # The value
     elif j != 'raw':  # Exclude raw. All others are lists:
       s += j + fd  # The key
       t = re.sub(crlf, nl, i[j])
