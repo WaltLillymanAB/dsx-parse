@@ -649,6 +649,7 @@ class DSXParser(object):
 	def __init__(self, filename=None, data=None):
 		self.filename = filename
 		self.data = data
+
 	def parse(self):
 		if self.filename:
 			with open(self.filename) as f:
@@ -662,12 +663,12 @@ class DSXParser(object):
 		else:
 			print("No file or data specified")
 			raise Exception
+
 	def parse_dsx(self, dsx):
 		dsx_dict = {"jobs":[]}
 		lines = iter(dsx.split("\n"))
 		while True:
 			try:
-				# line = lines.__next__()  # __next__()
 				line = lines.__next__() 
 				if re.match(r'.*BEGIN HEADER.*', line):
 					subr = line +"\n"
@@ -686,10 +687,10 @@ class DSXParser(object):
 						if re.match(r'.*END DSJOB.*', line):
 							dsx_dict["jobs"].append(self.parse_job(subr))
 							break
-
 			except StopIteration:
 				break
 		return dsx_dict		
+
 	def parse_job(self, job):
 		j_dict = {"records":[], "raw":""}
 		raw = ""
@@ -736,6 +737,7 @@ class DSXParser(object):
 				break
 		j_dict["raw"] = raw
 		return j_dict
+
 	def parse_record(self, record):
 		r_dict = {"subrecords":[]}
 		lines = iter(record.split("\n"))
@@ -940,8 +942,13 @@ if __name__ == "__main__":
 									print (sub.get("sourcecolumn"), "|", sub.get("derivation").replace(sv["name"], "#"+sv["expression"]+"#"), "|", sub.get("name"))
 									break
 							print (sub.get("sourcecolumn"), "|", sub.get("derivation"), "|", sub.get("name"))
+	elif mode == "neither":
+		print(f'Mode is {mode}')
 
 	# Save dictionary to file:
-	with open('EDW_DW1_PROD.pkl', 'wb') as f:
+	project_file='EDW_DW1_PROD'
+	pickle_file=project_file + '.pkl'
+
+	with open(pickle_file, 'wb') as f:
 		# Pickle the 'data' dictionary using the highest protocol available.
 		pickle.dump(d, f, pickle.HIGHEST_PROTOCOL)
