@@ -83,7 +83,7 @@ s_cnt=0
 # There's many "job" records per project file. Get some "job" attributes:
 for i in d.properties.get('jobs'):
   j_cnt += 1
-  print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
+  print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
   s += f'Job' + fd + str(j_cnt) + fd
   for j in ['identifier','datemodified']: 
     s += j + fd  # The key
@@ -115,8 +115,13 @@ for i in d.properties.get('jobs'):
 
   # At the end of each job record:
   s+='\n'
+  
+  # While debugging, many fewer rows, so faster:
+  if j_cnt==155:
+    break
 
 # Write that string to a file.
 print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Writing parsed text to file.')
-with open(parsed_file, 'wb') as out:
+file_name = strftime("%Y%m%d_%H%M%S")+'_'+parsed_file
+with open(file_name, 'wb') as out:
   out.write(s.encode('utf-8'))
