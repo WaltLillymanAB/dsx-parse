@@ -2,6 +2,7 @@ Teradata Using Project/
 Results/
 venv/
 .vscode/
+bak/*
 *.pkl
 *.txt
 *.xls*

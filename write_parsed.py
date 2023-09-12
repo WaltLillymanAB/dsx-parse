@@ -1,9 +1,9 @@
-import sys
+from time import strftime
 import re
 import dill as pickle
 from inspect import currentframe, getframeinfo
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
+# import pprint
+# pp = pprint.PrettyPrinter(indent=4)
 
 project_file='EDW_DW1_PROD'
 pickle_file=project_file + '.pkl'
@@ -11,7 +11,7 @@ pretty_file=project_file + '_pp.txt'
 parsed_file=project_file + '_parsed.txt'
 
 # Load the dictionary from a .pkl file created by dsx-parse.py
-print(f'\n### {getframeinfo(currentframe()).lineno}: Loading pickle file into a dictionary.')
+print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Loading pickle file into a dictionary.')
 with open(pickle_file, 'rb') as f:
   d = pickle.load(f)
 
@@ -67,63 +67,51 @@ fd='¥'         # Field delimiter in output, Alt-0165
 crlf='[\r\n]'  # Carriage-return and line-feed pattern to replace.
 nl=' '         # Replacement text for embedded CR+LF.
 
-print(f'\n### {getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
+print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
 # There's one header per DSX project file. Get some "header" attributes:
-i = d.properties.get('header')
-for j in ['servername','toolinstanceid']:
-  s += j + fd  # The key
-  t = re.sub(crlf, nl, i.get(j))  # Replace cr+lf
-  s += t + fd  # The value
+# i = d.properties.get('header')
+# for j in ['servername','toolinstanceid']:
+#   s += j + fd  # The key
+#   t = re.sub(crlf, nl, i.get(j))  # Replace cr+lf
+#   s += t + fd  # The value
+
+# Counters:
+j_cnt=0
+r_cnt=0
+s_cnt=0
 
 # There's many "job" records per project file. Get some "job" attributes:
 for i in d.properties.get('jobs'):
+  j_cnt += 1
+  print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
   for j in ['identifier','datemodified']: 
-    s += j + fd
-    t = re.sub(crlf, nl, i[j])
-    s += t + fd
+    s += j + fd  # The key
+    t = re.sub(crlf, nl, i[j])  # Replace cr+lf
+    s += t + fd  # The value
 
-  # There's many "records" records per job. Get some "records" attributes:
+  # There's many "records" per job. Get some "records" attributes:
   for j in i.get('records'): 
-    for k in ['name','oletype','category','parameters']:
+    r_cnt += 1
+    print(f'\t{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}...')
+    for k in ['identifier', 'name','oletype','category','parameters']:
       if j.get(k) is not None:
         s += k + fd
         t = re.sub(crlf, nl, j.get(k))
         s += t + fd
-s+='\n'
+    
+    # There's many "subrecords" per record.
+    for m in j.get('subrecords'):  # For each dict in the list.
+      s_cnt += 1
+      print(f'\t\t{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}, subrecord {s_cnt}...')
+      for p in m:  # For each key in the dict.
+        s += p + fd
+        t = re.sub(crlf, nl, m.get(p))
+        s += t + fd
 
-# subrecords...
-# NESTED already...
-for i in d.properties.get('jobs'):
-  for j in i:
-    if j == 'records':   # It's a list of dicts, incl. subrecords.
-        # There are subrecords in records. 
-        # So move subrecords saving down to inside here.
-        # And save the other stuff in records that isn't already being saved.
-      for n in i[j]:  # For each dict in the list.
-        for p in n:  # For each key in the dict.
-          print(p, type(p))
-          if p=='subrecords':
-            for q in n:  # For each key in the dict.
-                s += q + fd  # The key
-                t = re.sub(crlf, nl, n.get(q))   # EXAMINE THIS , this isn't right.
-                s += t + fd  # The value
-          else:
-            s += p + fd  # The key
-            t = re.sub(crlf, nl, n.get(p))  # n.get(p) produced a list of dicts to iterate thru...
-            s += t + fd  # The value
-    # elif  j == 'subrecords':  # It's a list of dicts.
-    #   for n in i[j]:  # For each dict in the list.
-    #     for p in n:  # For each key in the dict.
-    #       s += p + fd  # The key
-    #       t = re.sub(crlf, nl, n.get(p))
-    #       s += t + fd  # The value
-    elif j != 'raw':  # Exclude raw. All others are lists:
-      s += j + fd  # The key
-      t = re.sub(crlf, nl, i[j])
-      s += t + fd  # The value
+  # At the end of each job record:
   s+='\n'
 
 # Write that string to a file.
-print(f'\n### {getframeinfo(currentframe()).lineno}: Writing parsed text to file.')
+print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Writing parsed text to file.')
 with open(parsed_file, 'wb') as out:
   out.write(s.encode('utf-8'))
