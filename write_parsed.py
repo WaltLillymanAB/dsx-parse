@@ -2,8 +2,7 @@ from time import strftime
 import re
 import dill as pickle
 from inspect import currentframe, getframeinfo
-# import pprint
-# pp = pprint.PrettyPrinter(indent=4)
+import pandas as pd
 
 project_file='EDW_DW1_PROD'
 pickle_file=project_file + '.pkl'
@@ -120,7 +119,16 @@ for i in d.properties.get('jobs'):
   if j_cnt==155:
     break
 
-# Write that string to a file.
+# Write the delimited string to a dataframe or dictionary.
+# s_df = pd.DataFrame([x.split('¥') for x in s])
+# s_df = pd.read_csv(s, sep='¥', index_col=0, header=None)
+
+# Write the dataframe or dictionary to a pickle file:
+# with open(pickle_parsed_file, 'wb') as f:
+# 	# Pickle the 'data' dictionary using the highest protocol available.
+# 	pickle.dump(d, f, pickle.HIGHEST_PROTOCOL)
+
+# Write the delimited string to a file.
 print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Writing parsed text to file.')
 file_name = strftime("%Y%m%d_%H%M%S")+'_'+parsed_file
 with open(file_name, 'wb') as out:
