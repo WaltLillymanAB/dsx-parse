@@ -11,7 +11,7 @@ pretty_file=project_file + '_pp.txt'
 parsed_file=project_file + '_parsed.txt'
 
 # Load the dictionary from a .pkl file created by dsx-parse.py
-print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Loading pickle file into a dictionary.')
+print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Loading pickle file into a dictionary.')
 with open(pickle_file, 'rb') as f:
   d = pickle.load(f)
 
@@ -67,7 +67,7 @@ fd='¥'         # Field delimiter in output, Alt-0165
 crlf='[\r\n]'  # Carriage-return and line-feed pattern to replace.
 nl=' '         # Replacement text for embedded CR+LF.
 
-print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
+print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
 # There's one header per DSX project file. Get some "header" attributes:
 # i = d.properties.get('header')
 # for j in ['servername','toolinstanceid']:
@@ -83,7 +83,8 @@ s_cnt=0
 # There's many "job" records per project file. Get some "job" attributes:
 for i in d.properties.get('jobs'):
   j_cnt += 1
-  print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
+  print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
+  s += f'Job' + fd + j_cnt + fd
   for j in ['identifier','datemodified']: 
     s += j + fd  # The key
     t = re.sub(crlf, nl, i[j])  # Replace cr+lf
@@ -92,26 +93,30 @@ for i in d.properties.get('jobs'):
   # There's many "records" per job. Get some "records" attributes:
   for j in i.get('records'): 
     r_cnt += 1
-    print(f'\t{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}...')
+    # print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}...')
+    s += f'Record' + fd + r_cnt + fd 
     for k in ['identifier', 'name','oletype','category','parameters']:
       if j.get(k) is not None:
         s += k + fd
         t = re.sub(crlf, nl, j.get(k))
         s += t + fd
+    r_cnt=0
     
     # There's many "subrecords" per record.
     for m in j.get('subrecords'):  # For each dict in the list.
       s_cnt += 1
-      print(f'\t\t{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}, subrecord {s_cnt}...')
+      # print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}, subrecord {s_cnt}...')
+      s += f'Subrecord' + fd + s_cnt + fd 
       for p in m:  # For each key in the dict.
         s += p + fd
         t = re.sub(crlf, nl, m.get(p))
         s += t + fd
+    s_cnt=0
 
   # At the end of each job record:
   s+='\n'
 
 # Write that string to a file.
-print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  line {getframeinfo(currentframe()).lineno}: Writing parsed text to file.')
+print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Writing parsed text to file.')
 with open(parsed_file, 'wb') as out:
   out.write(s.encode('utf-8'))
