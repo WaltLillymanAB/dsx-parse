@@ -85,22 +85,21 @@ for i in d.properties.get('jobs'):
   j_cnt += 1
   print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
   s += f'Job' + fd + str(j_cnt) + fd
-  for j in ['identifier','datemodified']: 
-    s += j + fd  # The key
-    t = re.sub(crlf, nl, i[j])  # Replace cr+lf
-    s += t + fd  # The value
+  # for j in ['identifier','datemodified']: 
+  #   s += j + fd  # The key
+  #   t = re.sub(crlf, nl, i[j])  # Replace cr+lf
+  #   s += t + fd  # The value
 
   # There's many "records" per job. Get some "records" attributes:
   for j in i.get('records'): 
     r_cnt += 1
     # print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}...')
     s += f'Record' + fd + str(r_cnt) + fd 
-    for k in ['identifier', 'name','oletype','category','parameters']:
+    for k in ['name','oletype','category','parameters']:
       if j.get(k) is not None:
         s += k + fd
         t = re.sub(crlf, nl, j.get(k))
         s += t + fd
-    r_cnt=0
     
     # There's many "subrecords" per record.
     for m in j.get('subrecords'):  # For each dict in the list.
@@ -114,8 +113,9 @@ for i in d.properties.get('jobs'):
     s_cnt=0
 
   # At the end of each job record:
+  r_cnt=0
   s+='\n'
-  
+
   # While debugging, many fewer rows, so faster:
   if j_cnt==155:
     break
