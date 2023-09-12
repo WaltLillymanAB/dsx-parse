@@ -84,7 +84,7 @@ s_cnt=0
 for i in d.properties.get('jobs'):
   j_cnt += 1
   print(f'\n{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
-  s += f'Job' + fd + j_cnt + fd
+  s += f'Job' + fd + str(j_cnt) + fd
   for j in ['identifier','datemodified']: 
     s += j + fd  # The key
     t = re.sub(crlf, nl, i[j])  # Replace cr+lf
@@ -94,7 +94,7 @@ for i in d.properties.get('jobs'):
   for j in i.get('records'): 
     r_cnt += 1
     # print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}...')
-    s += f'Record' + fd + r_cnt + fd 
+    s += f'Record' + fd + str(r_cnt) + fd 
     for k in ['identifier', 'name','oletype','category','parameters']:
       if j.get(k) is not None:
         s += k + fd
@@ -106,7 +106,7 @@ for i in d.properties.get('jobs'):
     for m in j.get('subrecords'):  # For each dict in the list.
       s_cnt += 1
       # print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}, subrecord {s_cnt}...')
-      s += f'Subrecord' + fd + s_cnt + fd 
+      s += f'Subrecord' + fd + str(s_cnt) + fd 
       for p in m:  # For each key in the dict.
         s += p + fd
         t = re.sub(crlf, nl, m.get(p))
