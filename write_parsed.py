@@ -80,6 +80,9 @@ subrecord=''
 with open(interest_items, mode='w', encoding="utf-8") as f:
   f.write('project\tjob\tidentifier\trecord\trec_oletype\trec_name\trec_category\tsubrecord\tsubrec_name\tsubrec_value\n')  # Header record
 
+  # Reset vars:
+  identifier=''; rec_oletype=''; rec_name=''; rec_category=''; subrec_name=''; subrec_value=''; is_usersql=False; wrote_record=False
+
   print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
   # There's one header per DSX project file. Get some "header" attributes:
   i = d.properties.get('header')
@@ -96,7 +99,6 @@ with open(interest_items, mode='w', encoding="utf-8") as f:
     print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}...')
     job = str(j_cnt)
     s += f'Job' + fd + job + fd
-    # for j in ['identifier','datemodified']: 
     for j in ['identifier']: 
       s += j + fd  # The key
       t = re.sub(crlf, nl, i[j])  # Replace cr+lf
@@ -109,37 +111,54 @@ with open(interest_items, mode='w', encoding="utf-8") as f:
       record = r_cnt
       # print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Job {j_cnt}, record {r_cnt}...')
       s += f'Record' + fd + str(r_cnt) + fd 
-      for k in ['OLEType','Name','Category']:
-        if j.get(k) is not None:
+      for k in ['oletype','name','category']:
+        if j.get(k) is not None:  # j.get('oletype')
           s += k + fd
           t = re.sub(crlf, nl, j.get(k))
           s += t + fd
-          if k=='OLEType': rec_oletype=t
-          if k=='Name': rec_name=t
-          if k=='Category': rec_category=t
+          if k=='oletype': rec_oletype=t
+          if k=='name': rec_name=t
+          if k=='category': rec_category=t
       
       # There's many "subrecords" per record.
       for m in j.get('subrecords'):  # For each dict in the list.
         s_cnt += 1
         subrecord = s_cnt
         s += f'Subrecord' + fd + str(s_cnt) + fd
-        for p in ['Name','Value']:
-          for p in m:  # For each key in the dict.
-            s += p + fd
-            t = re.sub(crlf, nl, m.get(p))
-            s += t + fd
-            if p=='Name': subrec_name=t
-            if p=='Value': subrec_value=t
+        for p in m:  # For each key in the dict.
+          s += p + fd
+          t = re.sub(crlf, nl, m.get(p))
+          s += t + fd
+          if p=='tabledef': 
+            subrec_name=p
+            subrec_value=t
+          # Grab SQL:
+          if p=='name':
+            if t=='USERSQL':
+              is_usersql=True
+              subrec_name=t
+          if p=='value':
+              if is_usersql:
+                subrec_value=t
+                is_usersql=False
+        # At the end of each subrecord:
+        if subrec_name != '':
+          f.write(project+'\t'+str(job)+'\t'+identifier+'\t'+str(record)+'\t'+rec_oletype+'\t'+rec_name+'\t'+rec_category+'\t'+str(subrecord)+'\t'+subrec_name+'\t'+subrec_value+'\n')  # Header record
+          wrote_record=True
+          subrec_name=''; subrec_value=''
       s_cnt=0
 
     # At the end of each job record:
-    f.write(project+'\t'+job+'\t'+identifier+'\t'+record+'\t'+rec_oletype+'\t'+rec_name+'\t'+rec_category+'\t'+subrecord+'\t'+subrec_name+'\t'+subrec_value+'\n')  # Header record
-    identifier=''; rec_oletype=''; rec_name=''; rec_category=''; subrec_name=''; subrec_value=''
+    if not wrote_record:
+      f.write(project+'\t'+str(job)+'\t'+identifier+'\t'+str(record)+'\t'+rec_oletype+'\t'+rec_name+'\t'+rec_category+'\t'+str(subrecord)+'\t'+subrec_name+'\t'+subrec_value+'\n')  # Header record
+      wrote_record=False
+    # Reset vars:
+    identifier=''; rec_oletype=''; rec_name=''; rec_category=''; subrec_name=''; subrec_value=''; is_usersql=False; wrote_record=False
     r_cnt=0
     s+='\n'
 
     # While debugging, use many fewer rows:
-    if j_cnt==155:
+    if j_cnt==5:
       break
 
 exit(0)
