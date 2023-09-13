@@ -1,3 +1,4 @@
+# This reads the string into a dataframe, which I abandoned, currently, in favor of writing directly to the final dest., a csv file.
 import pandas as pd
 
 with open('20230912_090504_EDW_DW1_PROD_parsed.txt') as f:
