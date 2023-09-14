@@ -21,7 +21,7 @@ crlf='[\r\n]'  # Carriage-return and line-feed pattern to replace.
 nl=' '         # Replacement text for embedded CR+LF.
 
 # StageTypes of interest:
-stage_types_desired=['CODBCSTAGE','ODBCCONNECTOR','ODBCCONNECTORPX','ORACLECONNECTOR','ORACLECONNECTORPX','ORAOCI9','PXODBC','PXORACLE']
+stagetype_desired=['CODBCSTAGE','ODBCCONNECTOR','ODBCCONNECTORPX','ORACLECONNECTOR','ORACLECONNECTORPX','ORAOCI9','PXODBC','PXORACLE']
 
 # Counters:
 job_count=0; rec_count=0; subrec_count=0
@@ -66,10 +66,10 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
           if k=='inputpins': rec_inputpins=t
           if k=='stagetype': rec_stagetype=t
 
-      # Keep inputpins & stagetype only for desired stagetypes:
-      if rec_stagetype not in stage_types_desired:
+      # Keep inputpins & stagetype only for one of the desired stagetypes:
+      if rec_stagetype not in stagetype_desired:
         rec_inputpins=''; rec_stagetype=''
- 
+
       # There's many "subrecords" per record.
       for m in j.get('subrecords'):  # For each dict in the list.
         subrec_count += 1
@@ -96,7 +96,6 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
           subrec_name=''; subrec_value=''
       subrec_count=0
 
-    # At the end of each job record:
     if not wrote_record:
       f.write(project+'\t'+str(job)+'\t'+identifier+'\t'+str(record)+'\t'+rec_oletype+'\t'+rec_name+'\t'+rec_category+'\t'+rec_inputpins+'\t'+rec_stagetype+'\t'+str(subrecord)+'\t'+subrec_name+'\t'+subrec_value+'\n')  # Header record
     # Reset vars:
@@ -104,5 +103,5 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
     rec_count=0
 
     # While debugging, use many fewer rows:
-    if job_count==5:
-      break
+    # if job_count==5:
+    #   break
