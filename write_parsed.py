@@ -37,7 +37,7 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
   f.write('DSX Project\tJob #\tJob name\tRecord #\tOLEType\tRecord Name\tRecord Category\tInputPins\tStageType\tSubrecord #\tSubrecord Name\tSubrecord Value\n')
 
   # Reset vars that will save contents of items of interest for writing each line to a file per record/subrecord.:
-  identifier=''; rec_oletype=''; rec_name=''; rec_category=''; rec_inputpins=''; rec_stagetype=''; subrec_name=''; subrec_value=''; is_inputpins=False; is_usersql=False; wrote_record=False
+  identifier=''; rec_oletype=''; rec_name=''; rec_category=''; rec_inputpins=''; rec_stagetype=''; subrec_name=''; subrec_value=''; is_usersql=False; wrote_record=False
 
   print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Parsing dictionary contents.')
   # There's one header per DSX project file. Get the header attribute for this DSX project name:
@@ -68,7 +68,7 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
 
       # Keep inputpins & stagetype only for desired stagetypes:
       if rec_stagetype not in stage_types_desired:
-        rec_inputpins=''; rec_stagetype=''; is_inputpins=False
+        rec_inputpins=''; rec_stagetype=''
  
       # There's many "subrecords" per record.
       for m in j.get('subrecords'):  # For each dict in the list.
@@ -91,7 +91,7 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
         # At the end of each subrecord:
         # If subrec_name was populated, print the row to the file:
         if subrec_name != '':
-          f.write(project+'\t'+str(job)+'\t'+identifier+'\t'+str(record)+'\t'+rec_oletype+'\t'+rec_name+'\t'+rec_category+'\t'+rec_inputpins+'\t'+rec_stagetype+'\t'+str(subrecord)+'\t'+subrec_name+'\t'+subrec_value+'\n')  # Header record
+          f.write(project+'\t'+str(job)+'\t'+identifier+'\t'+str(record)+'\t'+rec_oletype+'\t'+rec_name+'\t'+rec_category+'\t'+rec_inputpins+'\t'+rec_stagetype+'\t'+str(subrecord)+'\t'+subrec_name+'\t'+subrec_value+'\n')
           wrote_record=True
           subrec_name=''; subrec_value=''
       subrec_count=0
@@ -100,7 +100,7 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
     if not wrote_record:
       f.write(project+'\t'+str(job)+'\t'+identifier+'\t'+str(record)+'\t'+rec_oletype+'\t'+rec_name+'\t'+rec_category+'\t'+rec_inputpins+'\t'+rec_stagetype+'\t'+str(subrecord)+'\t'+subrec_name+'\t'+subrec_value+'\n')  # Header record
     # Reset vars:
-    identifier=''; rec_oletype=''; rec_name=''; rec_category=''; rec_inputpins=''; rec_stagetype=''; subrec_name=''; subrec_value=''; is_inputpins=False; is_usersql=False; wrote_record=False
+    identifier=''; rec_oletype=''; rec_name=''; rec_category=''; rec_inputpins=''; rec_stagetype=''; subrec_name=''; subrec_value=''; is_usersql=False; wrote_record=False
     rec_count=0
 
     # While debugging, use many fewer rows:
