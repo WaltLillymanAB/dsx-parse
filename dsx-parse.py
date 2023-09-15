@@ -946,8 +946,7 @@ if __name__ == "__main__":
 		print(f'Mode is {mode}')
 
 	# Save dictionary to file:
-	project_file='EDW_DW1_PROD'
-	pickle_file=project_file + '.pkl'
+	pickle_file=sys.argv[2][:-4] + '.pkl'
 
 	with open(pickle_file, 'wb') as f:
 		# Pickle the 'data' dictionary using the highest protocol available.

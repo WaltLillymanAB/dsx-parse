@@ -1,3 +1,4 @@
+# Walt Lillyman, 9/14/23
 # Read the dictionary from the pkl file.
 # Store its contents into a very wide string.
 # Also parse some items of interest from it and write them to a text file.:
@@ -6,11 +7,9 @@ import re
 import dill as pickle
 from inspect import currentframe, getframeinfo
 
-project_file='EDW_DW1_PROD'
+project_file='Teradata Using Project\\EDW_DW1_PROD'
 pickle_file=project_file + '.pkl'
-pretty_file=project_file + '_pp.txt'
 parsed_file=project_file + '_parsed.txt'
-interest_items='interest_items'
 
 # Load the dictionary from a .pkl file created by dsx-parse.py
 print(f'{strftime("%Y-%m-%d %H:%M:%S")}  #{getframeinfo(currentframe()).lineno}: Loading pickle file into a dictionary.')
@@ -21,7 +20,9 @@ crlf='[\r\n]'  # Carriage-return and line-feed pattern to replace.
 nl=' '         # Replacement text for embedded CR+LF.
 
 # StageTypes of interest:
-stagetype_desired=['CODBCSTAGE','ODBCCONNECTOR','ODBCCONNECTORPX','ORACLECONNECTOR','ORACLECONNECTORPX','ORAOCI9','PXODBC','PXORACLE']
+stagetype_desired=['CODBCStage','ODBCConnector','ODBCConnectorPX','OracleConnector','OracleConnector','ORAOCI9','PxOdbc','PxOracle']
+# Make lowercase for comparison:
+stagetype_desired=[stagetype_desired.lower() for stagetype_desired in ['CODBCStage','ODBCConnector','ODBCConnectorPX','OracleConnector','OracleConnector','ORAOCI9','PxOdbc','PxOracle']]
 
 # Counters:
 job_count=0; rec_count=0; subrec_count=0
@@ -29,10 +30,8 @@ job_count=0; rec_count=0; subrec_count=0
 # Keep track of current position:
 job=''; record=''; subrecord=''
 
-file_name = strftime("%Y%m%d_%H%M%S")+'_'+parsed_file
-
 # Capture items of interest to a file:
-with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encoding="utf-8") as f:
+with open(parsed_file, mode='w', encoding="utf-8") as f:
   # Print header record:
   f.write('DSX Project\tJob #\tJob name\tRecord #\tOLEType\tRecord Name\tRecord Category\tInputPins\tStageType\tSubrecord #\tSubrecord Name\tSubrecord Value\n')
 
@@ -67,7 +66,7 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
           if k=='stagetype': rec_stagetype=t
 
       # Keep inputpins & stagetype only for one of the desired stagetypes:
-      if rec_stagetype not in stagetype_desired:
+      if rec_stagetype.lower() not in stagetype_desired:
         rec_inputpins=''; rec_stagetype=''
 
       # There's many "subrecords" per record.
@@ -102,6 +101,6 @@ with open(interest_items+'_'+strftime("%Y%m%d_%H%M%S")+'.txt', mode='w', encodin
     identifier=''; rec_oletype=''; rec_name=''; rec_category=''; rec_inputpins=''; rec_stagetype=''; subrec_name=''; subrec_value=''; is_usersql=False; wrote_record=False
     rec_count=0
 
-    # While debugging, use many fewer rows:
+    # While debugging, process many fewer rows:
     # if job_count==5:
     #   break
