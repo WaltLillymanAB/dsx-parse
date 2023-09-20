@@ -27,5 +27,3 @@ Parsing a large Datastage project `.dsx` file can take some time, so I save the 
 ## write_parsed.py
 A subsequent program I wrote from scratch, `write_parsed.py` reads the dictionary object from the `.pkl` file, looks for items of interest, and outputs those to a delimited text file for browsing & filtering in Excel.
 
-
-
