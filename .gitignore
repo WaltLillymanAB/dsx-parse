@@ -2,7 +2,6 @@ Teradata Using Project/
 Results/
 venv/
 bak/
-bak/*
 *.pkl
 *.txt
 *.xls*
