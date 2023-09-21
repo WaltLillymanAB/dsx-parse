@@ -1,7 +1,9 @@
 # Walt Lillyman, 9/14/23
 # Read the dictionary from the pkl file.
-# Store its contents into a very wide string.
-# Also parse some items of interest from it and write them to a text file.:
+# Parse some items of interest from it and write them to a text file.
+# In this case, I'm looking for what "writes to Oracle", which is represented by 
+# UserSQL statements for specific "Oracle" stage types that have "inputpins" values.
+
 from time import strftime
 import re
 import dill as pickle
