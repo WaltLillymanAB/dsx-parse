@@ -27,5 +27,5 @@ Parsing a large Datastage project `.dsx` file can take some time, so I save the 
 ## write_parsed.py
 A subsequent program I wrote from scratch, `write_parsed.py` reads the dictionary object from the `.pkl` file, looks for items of interest, and outputs those to a delimited text file for browsing & filtering in Excel.
 
-## scrap heap.py
-This contains junk I typed, documented and tried before settling on the final product. It's a frightening revelation of my amateur python skills, don't show my boss.
+## scrap heap.txt
+This contains junk I typed, documented and tried before settling on the final product.

@@ -7,3 +7,4 @@ bak/
 *.xls*
 !Python venv setup.txt
 !requirements.txt
+!scrap heap.txt
