@@ -1,7 +1,7 @@
 # dsx-parse
 _Walt Lillyman, 9/20/23_
 
-Initially forked from `mcfitz2/dsx-parse`, this repo contains code to parse Datastage exported `.dsx` files to identify Datastage jobs and the objects they operate on/with. The code only parses and enumerates things, it doesn't explain relationships or recurse for deeper details.
+Initially forked from `mcfitz2/dsx-parse`, this repo contains code to parse Datastage `.dsx` files to identify Datastage jobs and the objects they operate on/with. The code only parses and enumerates things, it doesn't explain relationships or recurse for deeper details.
 
 The python programs are intended to run as utilities on the desktop, not as an orchestrated app in the cloud. They've only been run on Windows.
 
