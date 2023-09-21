@@ -1,0 +1,23 @@
+Python venv setup.txt
+
+Launch Powershell.
+Change to app's directory.
+
+# python -m venv venv
+
+# .\venv\Scripts\activate
+
+# Example requirements file:
+# cat .\requirements.txt
+numpy==1.18.4
+pandas==1.0.5
+python-dateutil==2.8.1
+pytz==2020.1
+six==1.15.0
+sqlparse
+...
+
+# pip3 install -r requirements.txt
+
+# Example run:
+# (venv) PS D:\Repo\DSX_Parser> python .\dsx-parse.py neither "Teradata Using Project\EDW_DW2_PROD.dsx"
